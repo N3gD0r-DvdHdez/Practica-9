@@ -225,8 +225,11 @@ public class PASM {
 								line = "CONTLOC" + "\t" + instr.getContloc() + "\t"+ label + "\t" + codop + "\t" + op;
 								String dest = "-1";
 
-								for(int pos = i; pos < lista.size() && pos + 1 < lista.size() && pos + 2 < lista.size(); pos++) {
-									if(!lista.get(pos + 1).getCodop().equals("EQU")) {
+								for(int pos = i; pos < lista.size() && pos + 1 < lista.size(); pos++) {
+									if(lista.get(pos + 1).getCodop().equals("END")){
+										dest = lista.get(pos + 1).getContloc();
+										break;
+									} else if(!lista.get(pos + 1).getCodop().equals("EQU")) {
 										dest = lista.get(pos + 1).getContloc();
 										break;
 									} else if(!lista.get(pos + 2).getCodop().equals("EQU")) {
@@ -235,13 +238,17 @@ public class PASM {
 									}
 								}
 
-								if(dest.equals(-1))
-									throw new RuntimeErrors("ContLocNotFound");
+								if(dest.equals("-1")) {
+									throw new RuntimeErrors("DestinyNotFound");
+								}
 								
+
 								if(matcher.isLabel(op + ":")) {
 									int origen = Integer.parseInt(dest, 16);
 									int destino = Integer.parseInt(initFiles.getSymb(op), 16);
+
 									int despl = destino - origen;
+
 									String tohexvalue = Integer.toHexString(despl).toUpperCase();
 
 									if(instr.getBytesC() == 1 && (despl < 128 && despl > -129)) {
